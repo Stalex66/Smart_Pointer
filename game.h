@@ -1,8 +1,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include "game.cpp"
-
+#include <map>
 
 class Game{
   string name;
@@ -20,7 +19,7 @@ public:
   weak_ptr<Player> play(size_t i);
   virtual ~Game() = default;
   virtual ostream& print(ostream& o)const;
-  friend operator<<(Game a, Game b);
+  friend ostream& operator<<(ostream& o, Game a);
 };
 
 class UGame: public Game{

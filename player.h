@@ -1,10 +1,17 @@
+#ifndef player_h
+#define player_h
+
 #include <iostream>
 #include <memory>
 #include <string>
 #include <map>
 #include <vector>
 #include "game.cpp"
+#include "game.h"
 using namespace std;
+class Game;
+enum class Mode{Ranked,Unranked};
+
 
 class Player{
   string name;
@@ -14,7 +21,7 @@ class Player{
 
 public:
 
-  Player(string name,intr mmr);
+  Player(string name,int mmr);
   string get_name() const;
   int get_mmr() const;
   shared_ptr<Game> get_hosted_game() const;
@@ -28,3 +35,4 @@ public:
   friend ostream& operator<<(ostream& o, Player a);
 
 };
+#endif

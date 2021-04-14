@@ -2,6 +2,9 @@
 #include <memory>
 #include <string>
 #include <map>
+#include "player.cpp"
+
+using namespace std;
 
 class Game{
   string name;

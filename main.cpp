@@ -4,6 +4,6 @@
 using namespace std;
 
 int main(){
-  cout << "test";
+    std::shared_ptr<Player> p1 = std::make_shared<Player>("Klaus",122);
 
 }

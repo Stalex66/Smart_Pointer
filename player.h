@@ -6,14 +6,13 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "game.cpp"
 #include "game.h"
 using namespace std;
 class Game;
 enum class Mode{Ranked,Unranked};
 
 
-class Player{
+class Player: enable_shared_from_this<Player>{
   string name;
   int mmr;
   shared_ptr<Game>hosted_game;

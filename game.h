@@ -6,14 +6,13 @@
 #include <string>
 #include <map>
 #include "player.cpp"
+#include "gamekey.h"
 
 using namespace std;
 //using Mode = Player::Mode;
-class Player;
-class GameKey;
 
 
-class Game{
+class Game: public enable_shared_from_this<Game>{
   string name;
   weak_ptr<Player> host;
   map<string,weak_ptr<Player>> players;

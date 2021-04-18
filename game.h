@@ -1,3 +1,4 @@
+
 #ifndef game_h
 #define game_h
 
@@ -5,7 +6,7 @@
 #include <memory>
 #include <string>
 #include <map>
-#include "gamekey.h"
+#include "player.h"
 class Player;
 class GameKey;
 
@@ -26,11 +27,10 @@ public:
   bool add_player(const GameKey& gk, shared_ptr<Player> p);
   weak_ptr<Player> best_player() const;
   size_t number_of_players() const;
-  //virtual int change(bool) const = 0;
+  virtual int change(bool) const = 0;
   weak_ptr<Player> play(size_t i);
   virtual ~Game() = default;
   virtual ostream& print(ostream& o)const;
-  virtual ostream& operator<<(ostream& o);
 };
 
 class RGame: public Game{

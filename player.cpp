@@ -1,4 +1,7 @@
 #include "player.h"
+#include "game.h"
+#include "gamekey.h"
+
 using namespace std;
 
 Player::Player(string name,int mmr):name{name},mmr{mmr}{
@@ -13,52 +16,59 @@ int Player::get_mmr() const{
     return mmr;
 }
 
-shared_ptr<Game> Player::get_hosted_game() const{
-    if(hosted_game != nullptr){return hosted_game;}
-    else return nullptr;
-
+shared_ptr<Game> Player::get_hosted_game() const {
+    return hosted_game;
 }
 
-void Player::change_mmr(int n){
-    if(mmr+n>-1 && mmr+n <10000 ){
-        mmr += n;
+void Player::change_mmr(int n) {
+    mmr += n;
+    if(mmr>9999) {
+        mmr = 9999;
+    }
+    if(mmr<0) {
+        mmr =0;
     }
 }
 
-bool Player::host_game(string s, Mode m){ // game erzeugen noch implementieren
-    if(s.empty()) throw runtime_error("host_game");
-    if(hosted_game.use_count() == 0) return false;
-    else{
-        if(m ==Mode::Ranked){
-            hosted_game = RGame(s,shared_ptr<Player>(this));
-        }
-        else{
-            hosted_game = UGame(s,shared_ptr<Player>(this));
-        }
-
+bool Player::host_game(string s, Mode m) {
+    if(s.size()==0) {
+        throw runtime_error("");
     }
-    return true;
-}
-
-bool Player::join_game(shared_ptr <Game> g){
-    bool cond = (g.get()->add_player(GameKey(),shared_from_this())) // statt get mal derefenzieren probieren bitte
-        if(cond){
-        games.insert({g.get()->get_name(),g});
-            return true;}
-        else
-            return false;
-
-}
-
-bool Player::leave_game(shared_ptr <Game> g) {
-    bool cond1 = (find(games.begin(),games.end(),g.get()->get_name()) != games.end());
-    games.erase(g.get()->get_name());
-    bool cond2 = (g.get()->remove_player(GameKey(),shared_from_this()));
-
-    if(cond1 && cond2)
+    if(hosted_game.use_count()==0) {
+        if(m==Mode::Ranked) {
+            auto p = make_shared<RGame>(s,shared_from_this());
+            hosted_game=p;
+        }
+        if(m==Mode::Unranked) {
+            auto p = make_shared<UGame>(s,shared_from_this());
+            hosted_game=p;
+        }
         return true;
-    else
-        return false;
+    }
+    return false;
+}
+
+
+bool Player::join_game(shared_ptr<Game> g) {
+    
+    
+    if(g.get()->add_player(GameKey(),shared_from_this())) {
+        games.insert({g.get()->get_name(),g});
+        return true;
+    };
+     
+    return false;
+}
+
+bool Player::leave_game(shared_ptr<Game> g) {
+    
+    // check ob erfolgreich?
+    games.erase(g.get()->get_name());
+    if(g.get()->remove_player(GameKey(),shared_from_this())) {
+        return true;
+    };
+    
+    return false;
 
 
 }
@@ -71,13 +81,13 @@ vector<weak_ptr<Player>> Player::invite_players(const vector<weak_ptr<Player>>& 
             if(!(i.lock().get()->join_game(shared_from_this().get()->get_hosted_game()))) // lock.get evtl ändern
                 out.push_back(i);
         }
+    
+    }
     return out;
     }
 
-    }
-
 bool Player::close_game(){
-    if(hosted_game.get != nullptr){
+    if(hosted_game.get() != nullptr){
         hosted_game.reset();
         return true;
     }

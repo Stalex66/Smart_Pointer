@@ -5,7 +5,6 @@
 #include <string>
 #include <map>
 #include "player.h"
-class Game;
 class GameKey{
 GameKey() {}
 

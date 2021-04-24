@@ -1,2 +1,2 @@
 language = "cpp"
-run = "clang++ main.cpp"
+run = "clang++ -Wall -std=c++17 main.cpp -o test"

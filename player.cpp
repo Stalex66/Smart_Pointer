@@ -93,7 +93,7 @@ ostream& Player::print(ostream& o) const {
     
     auto it = games.begin();
     if(hosted_game.get()!=nullptr) {
-    o << "[" << get_name() << " ," << get_mmr() << ", " << hosted_game.get()->get_name() << ", games: {";
+    o << "[" << get_name() << ", " << get_mmr() << ", hosts: " << hosted_game.get()->get_name() << ", games: {";
     for(size_t i=0;i<games.size();i++) {
         if(!it->second.expired()){
         if(i==0) {
@@ -108,7 +108,7 @@ ostream& Player::print(ostream& o) const {
     o << "}]";
     }
     else{
-    o << "[" << get_name() << " ," << get_mmr() << ", " << "nothing" << ", games: {";
+    o << "[" << get_name() << ", " << get_mmr() << ", " << "hosts: nothing" << ", games: {";
     for(size_t i=0;i<games.size();i++) {
         if(!it->second.expired()){
             if(i==0){

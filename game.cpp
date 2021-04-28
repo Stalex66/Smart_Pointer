@@ -1,9 +1,4 @@
-//
-//  game.cpp
-//  Gaming_Platform
-//
-//  Created by Christoph Loik on 15.04.21.
-//
+
 
 #include "game.h"
 #include <algorithm>
@@ -24,8 +19,8 @@ string Game::get_name() const {
 // prüfen ob beitreten möglich ist
 
 bool Game::is_allowed(int n) const {
-    int mmr = host.lock().get()->get_mmr();
-    if(n*9<mmr*10&&n*11>mmr*10) {
+    int mmr = host.lock()->get_mmr();
+    if(mmr*9<n*10 && mmr*11>n*10) {
         return true;
     }
     return false;
@@ -75,52 +70,60 @@ weak_ptr<Player> Game::best_player() const {
 
 // entfernt alle toten ptr, prüft ob i nicht kleiner als anzahl einträge oder host nicht da -> runtime error, dann winner aus neuer map 
 weak_ptr<Player> Game::play(size_t i) {
-   for(auto v: players){
+   
+  
+  for(auto v: players){
      if(v.second.expired())
      players.erase(v.first);
    }
+  
   if(host.expired() || players.size()<i) throw runtime_error("");
 
-    int index = 0;
-    for_each(players.begin(), players.end(), [&] (mypair a) {
-        if(index!=i) {
-        if(a.second.lock()->get_mmr()>best_player().lock()->get_mmr()) {
-            a.second.lock()->change_mmr(change(false));
-        }
-        a.second.lock()->change_mmr(change(false));
-      }
-      index++;
-    });
-
- 
     auto it = players.begin();
-    for(size_t k=0;k<i;k++) {
-        k++;
+  for(size_t j=0;j<i;j++){
+    it++;}
+  
+  
+  
+  int id=0;
+  for_each(players.begin(), players.end(), [&] (mypair a){
+  if(i!=id){
+    if(a.second.lock()->get_mmr() > it->second.lock()->get_mmr()){
+  	a.second.lock()->change_mmr(2*(change(false)));
     }
-    
+    else{
+    a.second.lock()->change_mmr(change(false));
+    }}
+    id++;
+  });
+  
+
+  
+  
+  
+  
+
     it->second.lock()->change_mmr(change(true));
-    
+
     return it->second;
 
-
-
-
-
 }
-
 
 // noch überarbeiten 
 ostream& Game::print(ostream& o) const {
     
-     o << "[" << get_name() << ", " << host.lock().get()->get_name() << host.lock().get()->get_mmr() << ", player: {";
+     o << "[" << get_name() << ", " << host.lock().get()->get_name() << ", "<<host.lock().get()->get_mmr() << ", player: {";
     auto it = players.begin();
+  	bool first = false;
     for(size_t i=0;i<players.size();i++) {
         if((i+1)<players.size()) {
-            o << it->second.lock().get()->get_name() << ", " << it->second.lock().get()->get_mmr();
+          if(first){ cout << ", ";} 
+            o << "[" << it->second.lock().get()->get_name() << ", " << it->second.lock().get()->get_mmr()<< "]";
             it++;
+          first = true;
         }
         else{
-            o << it->second.lock().get()->get_name();
+            o << ", [" << it->second.lock().get()->get_name() << ", " << it->second.lock().get()->get_mmr()<< "]";
         }
     }
     o << "}]";

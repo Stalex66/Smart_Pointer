@@ -17,6 +17,8 @@ using namespace std;
 
 
 int main(int argc, const char * argv[]) {
+
+
 #define WRK(cond) std::cout << (cond ? "\n worked \n" : "\n ERROR \n");
 
 // Konstruktor::
@@ -91,6 +93,8 @@ WRK(dota->is_allowed(100) == true);
 //WRK(dota->number_of_players() == 1);
 //weak_ptr<Player> pruf = dota->best_player(); // error weil leer??
 //WRK(pruf.lock()->get_name() == "Alex");
+
+
 
 
 

@@ -27,6 +27,7 @@ bool Game::is_allowed(int n) const {
 }
 
 
+
 // durchsucht Map schaut ob spieler da ist und entfernt ihn wenn ja 
 bool Game::remove_player(const GameKey& gk, shared_ptr<Player> p) {
     if(!(players.count(p->get_name()))) {return false;}
@@ -70,38 +71,38 @@ weak_ptr<Player> Game::best_player() const {
 
 // entfernt alle toten ptr, prüft ob i nicht kleiner als anzahl einträge oder host nicht da -> runtime error, dann winner aus neuer map 
 weak_ptr<Player> Game::play(size_t i) {
-   
-  
-  for(auto v: players){
-     if(v.second.expired())
-     players.erase(v.first);
-   }
-  
-  if(host.expired() || players.size()<i) throw runtime_error("");
+
+
+    for(auto v: players){
+        if(v.second.expired())
+            players.erase(v.first);
+    }
+
+    if(host.expired() || players.size()<i) throw runtime_error("");
 
     auto it = players.begin();
-  for(size_t j=0;j<i;j++){
-    it++;}
-  
-  
-  
-  int id=0;
-  for_each(players.begin(), players.end(), [&] (mypair a){
-  if(i!=id){
-    if(a.second.lock()->get_mmr() > it->second.lock()->get_mmr()){
-  	a.second.lock()->change_mmr(2*(change(false)));
-    }
-    else{
-    a.second.lock()->change_mmr(change(false));
-    }}
-    id++;
-  });
-  
+    for(size_t j=0;j<i;j++){
+        it++;}
 
-  
-  
-  
-  
+
+
+    int id=0;
+    for_each(players.begin(), players.end(), [&] (mypair a){
+        if(i!=id){
+            if(a.second.lock()->get_mmr() > it->second.lock()->get_mmr()){
+                a.second.lock()->change_mmr(2*(change(false)));
+            }
+            else{
+                a.second.lock()->change_mmr(change(false));
+            }}
+        id++;
+    });
+
+
+
+
+
+
 
     it->second.lock()->change_mmr(change(true));
 
@@ -109,26 +110,22 @@ weak_ptr<Player> Game::play(size_t i) {
 
 }
 
-// noch überarbeiten 
 ostream& Game::print(ostream& o) const {
-    
-     o << "[" << get_name() << ", " << host.lock().get()->get_name() << ", "<<host.lock().get()->get_mmr() << ", player: {";
-    auto it = players.begin();
-  	bool first = false;
-    for(size_t i=0;i<players.size();i++) {
-        if((i+1)<players.size()) {
-          if(first){ cout << ", ";} 
-            o << "[" << it->second.lock().get()->get_name() << ", " << it->second.lock().get()->get_mmr()<< "]";
-            it++;
-          first = true;
+    bool first = true;
+    o << "[" << get_name() << ", " << host.lock()->get_name() << ", "<<host.lock()->get_mmr() << ", player: {";
+    for(auto v: players){
+        if(v.second.lock()->get_name() == get_name()) continue;
+        if(first){
+            o << "[" << v.second.lock()->get_name() << ", " << v.second.lock()->get_mmr()<< "]";
+            first = false;
+
         }
         else{
-            o << ", [" << it->second.lock().get()->get_name() << ", " << it->second.lock().get()->get_mmr()<< "]";
-        }
-    }
+            o << ", [" << v.second.lock()->get_name() << ", " << v.second.lock()->get_mmr()<< "]";
+
+        }}
     o << "}]";
     return o;
-    
 }
 
 ostream& operator<<(ostream& os, const Game& g) {
@@ -146,8 +143,8 @@ ostream& operator<<(ostream& os, const RGame& g) {
 
 RGame::RGame(string s, shared_ptr<Player> p):Game(s,p) {}
 
-int RGame::change(bool win) const {
-    if(win) return 5;
+int RGame::change(bool a) const {
+    if(a) return 5;
     else return -5;
 }
 
@@ -161,7 +158,7 @@ ostream& RGame::print(ostream& o) const {
 
 UGame::UGame(string s,shared_ptr<Player> p):Game(s,p) {}
 
-int UGame::change(bool) const {
+int UGame::change(bool a) const {
     return 0;
 }
 

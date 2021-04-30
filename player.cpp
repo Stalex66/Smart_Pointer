@@ -49,8 +49,7 @@ bool Player::join_game(shared_ptr<Game> g) {
       	if(games[g->get_name()].expired()){
      games.erase(g->get_name()); 
     }
-       
-    
+
     bool cond = g->add_player((GameKey()), shared_from_this());
     if(cond){
       games.insert(make_pair(g->get_name(), g));
@@ -94,40 +93,38 @@ bool Player::close_game(){
         return false;
 }
 
-ostream& Player::print(ostream& o) const {
-    
-    auto it = games.begin();
-    if(hosted_game.get()!=nullptr) {
-    o << "[" << get_name() << ", " << get_mmr() << ", hosts: " << hosted_game.get()->get_name() << ", games: {";
-    for(size_t i=0;i<games.size();i++) {
-        if(!it->second.expired()){
-        if(i==0) {
-            o << it->second.lock().get()->get_name();
-        }
-        else{
-            o << ", " << it->second.lock().get()->get_name();
-        }
-        }
-        it++;
-    }
-    o << "}]";
-    }
-    else{
-    o << "[" << get_name() << ", " << get_mmr() << ", " << "hosts: nothing" << ", games: {";
-    for(size_t i=0;i<games.size();i++) {
-        if(!it->second.expired()){
-            if(i==0){
-                o << it->second.lock().get()->get_name();
-            }
-            else{
-                o << ", " << it->second.lock().get()->get_name();
+ostream& Player::print(ostream &o) const {
+    bool first = true;
+    if (hosted_game == nullptr) {
+        o << "[" << get_name() << ", " << get_mmr() << ", "
+          << "hosts: nothing"
+          << ", games: {";
+        for (auto v : games) {
+            if (!(v.second.expired())) {
+                if (first) {
+                    o << v.first;
+                    first = false;
+                } else {
+                    o << ", " << v.first;
+                }
             }
         }
-        it++;
+    } else {
+        o << "[" << get_name() << ", " << get_mmr()
+          << ", hosts: " << hosted_game->get_name() << ", games: {";
+        for (auto v : games) {
+            if (!(v.second.expired())) {
+                if (first) {
+                    o << v.first;
+                    first = false;
+                } else {
+                    o << ", " << v.first;
+                }
+            }
+        }
     }
+
     o << "}]";
-    }
-    
     return o;
 }
 

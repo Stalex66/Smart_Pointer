@@ -1,9 +1,13 @@
 #ifndef key_h
 #define key_h
-class Game;
+#include <iostream>
+#include <memory>
+#include <string>
+#include <map>
+#include "player.h"
 class GameKey{
-
 GameKey() {}
+
 friend bool Player::join_game(std::shared_ptr<Game>);
 friend bool Player::leave_game(std::shared_ptr<Game>);
 

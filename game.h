@@ -1,3 +1,4 @@
+
 #ifndef game_h
 #define game_h
 
@@ -5,11 +6,13 @@
 #include <memory>
 #include <string>
 #include <map>
-#include "player.cpp"
-#include "gamekey.h"
+#include "player.h"
+class Player;
+class GameKey;
 
 using namespace std;
 //using Mode = Player::Mode;
+
 
 
 class Game: public enable_shared_from_this<Game>{
@@ -28,20 +31,26 @@ public:
   weak_ptr<Player> play(size_t i);
   virtual ~Game() = default;
   virtual ostream& print(ostream& o)const;
-  friend ostream& operator<<(ostream& o, Game a);
 };
 
 class RGame: public Game{
+public:
   RGame(string,shared_ptr<Player>);
   int change(bool won) const;
   ostream& print(ostream& o)const;
 };
 
 class UGame: public Game{
+public:
   UGame(string,shared_ptr<Player>);
   int change(bool) const;
   ostream& print(ostream& o)const;
 
 };
+
+ostream& operator<<(ostream& s, const Game& a);
+ostream& operator<<(ostream& o, const UGame& a);
+ostream& operator<<(ostream& o, const RGame& a);
+
 
 #endif

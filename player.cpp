@@ -46,6 +46,11 @@ bool Player::host_game(string s, Mode m) {
 
 // add player -> ja -> eintragen -> nein return false
 bool Player::join_game(shared_ptr<Game> g) {
+      	if(games[g->get_name()].expired()){
+     games.erase(g->get_name()); 
+    }
+       
+    
     bool cond = g->add_player((GameKey()), shared_from_this());
     if(cond){
       games.insert(make_pair(g->get_name(), g));

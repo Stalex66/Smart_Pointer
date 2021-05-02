@@ -38,7 +38,7 @@ bool Game::remove_player(const GameKey& gk, shared_ptr<Player> p) {
 
 // als erstes schauen ob erlaubt, danach einfügen in die map
 bool Game::add_player(const GameKey& gk, shared_ptr<Player> p) {
-    if(players[p->get_name()].expired()) players.erase(p->get_name());
+    if(players[p->get_name()].expired()) players.erase(p->get_name()); // evtl unnötig 
     if(players.count(p->get_name())) return false;
     if(!(is_allowed(p->get_mmr()))) return false;
 
@@ -80,14 +80,14 @@ weak_ptr<Player> Game::best_player() const {
 // entfernt alle toten ptr, prüft ob i nicht kleiner als anzahl einträge oder host nicht da -> runtime error, dann winner aus neuer map
 weak_ptr<Player> Game::play(size_t i) {
 
-
+ if(host.expired())throw std::runtime_error("host is expired");
+ 
     for(auto v: players){
         if(v.second.expired())
             players.erase(v.first);
     }
 
-    if(host.expired() || players.size()<i || players.size() == i) throw runtime_error("");
-
+    if( players.size()<i || players.size() == i) throw runtime_error("");
     auto it = players.begin();
     for(size_t j=0;j<i;j++){
         it++;}
@@ -113,9 +113,8 @@ weak_ptr<Player> Game::play(size_t i) {
 
 
     it->second.lock()->change_mmr(change(true));
-
+    
     return it->second;
-
 }
 
 // noch überarbeiten

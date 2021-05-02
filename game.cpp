@@ -82,10 +82,13 @@ weak_ptr<Player> Game::play(size_t i) {
 
  if(host.expired())throw std::runtime_error("host is expired");
  
-    for(auto v: players){
-        if(v.second.expired())
-            players.erase(v.first);
+for (auto b = players.begin(); b != players.end();) { 
+    if (b->second.expired()) {
+       b = players.erase( b ); }// reseat iterator to a valid value post-erase
+    else {
+       ++b;
     }
+}
 
     if( players.size()<i || players.size() == i) throw runtime_error("");
     auto it = players.begin();

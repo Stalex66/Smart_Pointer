@@ -27,22 +27,22 @@ bool Game::is_allowed(int n) const {
 }
 
 
-
-// durchsucht Map schaut ob spieler da ist und entfernt ihn wenn ja 
+// durchsucht Map schaut ob spieler da ist und entfernt ihn wenn ja
 bool Game::remove_player(const GameKey& gk, shared_ptr<Player> p) {
     if(!(players.count(p->get_name()))) {return false;}
-    
+
     players.erase(players.find(p->get_name()));
-  
+
     return true;
 }
 
 // als erstes schauen ob erlaubt, danach einfügen in die map
 bool Game::add_player(const GameKey& gk, shared_ptr<Player> p) {
+    if(players[p->get_name()].expired()) players.erase(p->get_name());
     if(players.count(p->get_name())) return false;
     if(!(is_allowed(p->get_mmr()))) return false;
-   
-    
+
+
     players.insert({p.get()->get_name(),p});
 
     return true;
@@ -52,8 +52,8 @@ bool Game::add_player(const GameKey& gk, shared_ptr<Player> p) {
 size_t Game::number_of_players() const {
     int counter = 0;
     for(auto v: players){
-      if(v.second.expired() == false )
-      counter++;
+        if(v.second.expired() == false )
+            counter++;
     }
     return counter;
 }
@@ -61,15 +61,23 @@ size_t Game::number_of_players() const {
 
 weak_ptr<Player> Game::best_player() const {
     if(number_of_players()==0) {throw runtime_error("");}
-    
-    auto maximum = max_element(players.begin(), players.end(), [] (const mypair a, const mypair b) {
+    map<string,weak_ptr<Player>> players2;
+
+    for(auto v: players){
+        if(!(v.second.expired()))
+            players2.insert({v.first,v.second});
+    }
+    if(players2.size() == 0) {throw runtime_error("");}
+
+
+    auto maximum = max_element(players2.begin(), players2.end(), [] (const mypair a, const mypair b) {
         return a.second.lock()->get_mmr()<b.second.lock()->get_mmr();
     });
-    
+
     return maximum->second;
 }
 
-// entfernt alle toten ptr, prüft ob i nicht kleiner als anzahl einträge oder host nicht da -> runtime error, dann winner aus neuer map 
+// entfernt alle toten ptr, prüft ob i nicht kleiner als anzahl einträge oder host nicht da -> runtime error, dann winner aus neuer map
 weak_ptr<Player> Game::play(size_t i) {
 
 
@@ -78,7 +86,7 @@ weak_ptr<Player> Game::play(size_t i) {
             players.erase(v.first);
     }
 
-    if(host.expired() || players.size()<i) throw runtime_error("");
+    if(host.expired() || players.size()<i || players.size() == i) throw runtime_error("");
 
     auto it = players.begin();
     for(size_t j=0;j<i;j++){
@@ -110,18 +118,19 @@ weak_ptr<Player> Game::play(size_t i) {
 
 }
 
+// noch überarbeiten
 ostream& Game::print(ostream& o) const {
     bool first = true;
-    o << "[" << get_name() << ", " << host.lock()->get_name() << ", "<<host.lock()->get_mmr() << ", player: {";
+    o << "[" << get_name() << ", " << host.lock().get()->get_name() << ", "<<host.lock().get()->get_mmr() << ", player: {";
     for(auto v: players){
-        if(v.second.lock()->get_name() == get_name()) continue;
+        if(v.second.lock().get()->get_name() == get_name()) continue;
         if(first){
-            o << "[" << v.second.lock()->get_name() << ", " << v.second.lock()->get_mmr()<< "]";
+            o << "[" << v.second.lock().get()->get_name() << ", " << v.second.lock().get()->get_mmr()<< "]";
             first = false;
 
         }
         else{
-            o << ", [" << v.second.lock()->get_name() << ", " << v.second.lock()->get_mmr()<< "]";
+            o << ", [" << v.second.lock().get()->get_name() << ", " << v.second.lock().get()->get_mmr()<< "]";
 
         }}
     o << "}]";
@@ -143,8 +152,8 @@ ostream& operator<<(ostream& os, const RGame& g) {
 
 RGame::RGame(string s, shared_ptr<Player> p):Game(s,p) {}
 
-int RGame::change(bool a) const {
-    if(a) return 5;
+int RGame::change(bool win) const {
+    if(win) return 5;
     else return -5;
 }
 
@@ -158,7 +167,7 @@ ostream& RGame::print(ostream& o) const {
 
 UGame::UGame(string s,shared_ptr<Player> p):Game(s,p) {}
 
-int UGame::change(bool a) const {
+int UGame::change(bool) const {
     return 0;
 }
 
